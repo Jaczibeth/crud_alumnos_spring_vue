@@ -5,6 +5,7 @@ import axios from 'axios';
 const alumnos = ref([]);
 
 const nuevoAlumno = ref({
+  id: null, // ✅ Se añadió el campo id para edición
   numeroControl: '',
   nombre: '',
   apellidos: '',
@@ -14,6 +15,8 @@ const nuevoAlumno = ref({
   imagenURL: ''
 });
 
+const editado = ref(false);
+
 const cargarAlumnos = async () => {
   try {
     const response = await axios.get('http://localhost:8082/alumnos/traer-alumnos');
@@ -21,15 +24,23 @@ const cargarAlumnos = async () => {
     console.log(alumnos.value);
   } catch (error) {
     console.error('Error al cargar alumnos:', error);
-    alert('Error al cargar alumnos.');
+    alert('No se pudieron cargar los alumnos.');
   }
 }
 
 const agregarAlumno = async () => {
   try {
-    await axios.post('http://localhost:8082/alumnos/insertar-alumnos', nuevoAlumno.value);
+    if (editado.value) {
+      await axios.put(`http://localhost:8082/alumnos/editar-alumnos/${nuevoAlumno.value.id}`, nuevoAlumno.value); // ✅ Puerto corregido
+      editado.value = false;
+    } else {
+      await axios.post('http://localhost:8082/alumnos/insertar-alumnos', nuevoAlumno.value);
+    }
+
     await cargarAlumnos();
+
     nuevoAlumno.value = {
+      id: null, // ✅ Reiniciado
       numeroControl: '',
       nombre: '',
       apellidos: '',
@@ -39,16 +50,26 @@ const agregarAlumno = async () => {
       imagenURL: ''
     };
   } catch (error) {
-    console.error('Error al agregar alumno:', error);
-    alert('Hubo un problema al agregar el alumno.');
+    console.error('Error al agregar/editar alumno:', error);
+    alert('Hubo un problema al guardar los datos del alumno.');
   }
 }
 
-const eliminarAlumno = async (id) => {
+// Función para editar alumno
+const editarAlumno = (alumno) => {
+  Object.assign(nuevoAlumno.value, alumno);
+  editado.value = true;
+}
 
+const eliminarAlumno = async (id) => {
+  try {
     await axios.delete(`http://localhost:8082/alumnos/eliminar-alumnos/${id}`);
-    console.log(`Alumno eliminado con ID:` , id);
+    console.log('Alumno eliminado con ID:', id);
     await cargarAlumnos();
+  } catch (error) {
+    console.error('Error al eliminar alumno:', error);
+    alert('No se pudo eliminar el alumno.');
+  }
 }
 
 onMounted(cargarAlumnos);
@@ -91,27 +112,29 @@ onMounted(cargarAlumnos);
                 <input type="text" class="form-control" id="imagenURL" v-model="nuevoAlumno.imagenURL">
               </div>
             </div>
-            <button type="submit" class="btn btn-primary">Agregar Alumno</button>
+            <button type="submit" class="btn btn-primary">
+              {{ editado.value ? 'Actualizar Alumno' : 'Agregar Alumno' }} <!-- ✅ .value necesario -->
+            </button>
           </form>
         </div>
       </div>
 
       <div class="col-md-12">
         <div class="card shadow">
-          <div class="card-body"> <!-- ✅ Corrección aquí -->
+          <div class="card-body">
             <h5 class="card-title mb-3">Tabla De Alumnos</h5>
             <table class="table table-hover align-middle">
               <thead class="table-dark">
                 <tr>
-                  <th scope="col">ID</th>
-                  <th scope="col">Número Control</th>
-                  <th scope="col">Nombre</th>
-                  <th scope="col">Apellidos</th>
-                  <th scope="col">Teléfono</th>
-                  <th scope="col">Email</th>
-                  <th scope="col">Carrera</th>
-                  <th scope="col">Imagen</th>
-                  <th scope="col">Acción</th>
+                  <th>ID</th>
+                  <th>Número Control</th>
+                  <th>Nombre</th>
+                  <th>Apellidos</th>
+                  <th>Teléfono</th>
+                  <th>Email</th>
+                  <th>Carrera</th>
+                  <th>Imagen</th>
+                  <th>Acción</th>
                 </tr>
               </thead>
               <tbody>
@@ -132,10 +155,10 @@ onMounted(cargarAlumnos);
                     />
                   </td>
                   <td>
-                    <button @click="eliminarAlumno(alumno.id)" class="btn btn-danger mx-2">
+                    <button @click="eliminarAlumno(alumno.id)" class="btn btn-danger mx-2"> <!-- ✅ comillas corregidas -->
                       <i class="bi bi-trash2-fill"></i>
                     </button>
-                    <button class="btn btn-warning">
+                    <button @click="editarAlumno(alumno)" class="btn btn-warning">
                       <i class="bi bi-pencil-fill"></i>
                     </button>
                   </td>
