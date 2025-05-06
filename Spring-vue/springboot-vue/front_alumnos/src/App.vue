@@ -1,4 +1,15 @@
 <script setup>
+import { ref, onMounted } from 'vue';
+import axios from 'axios';
+
+const alumnos = ref([]);
+
+const cargarAlumnos = async () =>{
+    const response = await axios.get('http://localhost:8082/alumnos/traer-alumnos');
+    alumnos .value = response.data;
+}
+
+onMounted(cargarAlumnos);
 
 </script>
 
