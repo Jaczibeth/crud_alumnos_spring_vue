@@ -62,11 +62,14 @@ onMounted(cargarAlumnos);
           </form> <!-- CORRECCIÓN AQUÍ -->
         </div>
       </div>
-      <div class="col-md-12">
-        <h2>Tabla De Alumnos</h2>
 
-        <table class="table">
-          <thead>
+
+      <div class="col-md-12">
+        <div class="card shadow">
+          <div class="card body">
+            <h5 class="card title mb-3">Tabla De Alumnos</h5>
+            <table class="table table-hover align-middle">
+          <thead class="table-dark">
             <tr>
               <th scope="col">id</th>
               <th scope="col">numeroControl</th>
@@ -89,10 +92,15 @@ onMounted(cargarAlumnos);
               <td>{{ alumno.email }}</td>
               <td>{{ alumno.carrera }}</td>
               <td><img :src="alumno.imagenURL" alt="Imagen de Alumno" width="50" height="50"></td>
-              <td><button class="btn btn-danger">Eliminar</button></td>
+              <td>
+                <button class="btn btn-danger mx-2"><i class="bi bi-trash2-fill"></i></button>
+                <button class="btn btn-warning"><i class="bi bi-pencil-fill"></i></button>
+              </td>
             </tr>
           </tbody>
         </table>
+          </div>
+        </div>
       </div>
     </div>
   </div>
