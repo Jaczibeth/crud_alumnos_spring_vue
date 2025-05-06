@@ -4,7 +4,7 @@ import axios from 'axios';
 
 const alumnos = ref([]);
 
-const alumno = ref({
+const nuevoAlumno = ref({
   numeroControl: '',
   nombre: '',
   apellidos: '',
@@ -17,9 +17,26 @@ const alumno = ref({
 const cargarAlumnos = async () => {
   const response = await axios.get('http://localhost:8082/alumnos/traer-alumnos');
   alumnos.value = response.data;
+  console.log(alumnos.value);
+}
+
+const agregarAlumno = async () => {
+  await axios.post('http://localhost:8082/alumnos/insertar-alumnos' , nuevoAlumno.value);
+  await cargarAlumnos();
+  nuevoAlumno.value = {
+    numeroControl: '',
+    nombre: '',
+    apellidos: '',
+    telefono: '',
+    email: '',
+    carrera: '',
+    imagenURL: ''
+  }
 }
 
 onMounted(cargarAlumnos);
+
+
 </script>
 <template>
   <div class="container">
@@ -31,31 +48,32 @@ onMounted(cargarAlumnos);
             <div class="row">
             <div class="col-md-6 mb-3">
               <label for="numeroControl" class="form-label">Numero de Control</label>
-              <input type="text" class="form-control" id="numeroControl" v-model="alumno.numeroControl">
+              <input type="text" class="form-control" id="numeroControl" v-model="nuevoAlumno.numeroControl" required>
+
             </div>
             <div class="col-md-6 mb-3">
               <label for="nombre" class="form-label">Nombre</label>
-              <input type="text" class="form-control" id="nombre" v-model="alumno.nombre">
+              <input type="text" class="form-control" id="nombre" v-model="nuevoAlumno.nombre" required>
             </div>
             <div class="col-md-6 mb-3">
               <label for="apellidos" class="form-label">Apellidos</label>
-              <input type="text" class="form-control" id="apellidos" v-model="alumno.apellidos">
+              <input type="text" class="form-control" id="apellidos" v-model="nuevoAlumno.apellidos" required>
             </div>
             <div class="col-md-6 mb-3">
               <label for="telefono" class="form-label">Telefono</label>
-              <input type="text" class="form-control" id="telefono" v-model="alumno.telefono">
+              <input type="text" class="form-control" id="telefono" v-model="nuevoAlumno.telefono" required>
             </div>
             <div class="col-md-6 mb-3">
               <label for="email" class="form-label">Email</label>
-              <input type="email" class="form-control" id="email" v-model="alumno.email">
+              <input type="email" class="form-control" id="email" v-model="nuevoAlumno.email" required>
             </div>
             <div class="col-md-6 mb-3">
               <label for="carrera" class="form-label">Carrera</label>
-              <input type="text" class="form-control" id="carrera" v-model="alumno.carrera">
+              <input type="text" class="form-control" id="carrera" v-model="nuevoAlumno.carrera" required>
             </div>
             <div class="col-md-6 mb-3">
               <label for="imagenURL" class="form-label">Imagen URL</label>
-              <input type="text" class="form-control" id="imagenURL" v-model="alumno.imagenURL">
+              <input type="text" class="form-control" id="imagenURL" v-model="nuevoAlumno.imagenURL">
             </div>
           </div>
             <button type="submit" class="btn btn-primary">Agregar Alumno</button>
